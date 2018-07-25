@@ -1,9 +1,6 @@
-const Events = require('events');
-const DeepEqual = require('deep-equal');
-const uuidv1 = require('uuid/v1');
-const { execute } = require('apollo-link');
+// Setup a GraphQL subscription observable
 const { WebSocketLink } = require('apollo-link-ws');
-const { parse } = require('graphql');
+const { execute } = require('apollo-link');
 const { SubscriptionClient } = require('subscriptions-transport-ws');
 const ws = require('ws');
 
@@ -12,32 +9,13 @@ const getWsClient = function(wsurl) {
     wsurl, {reconnect: true}, ws
   );
   return client;
-}
+};
 
-module.exports = {
-	subscribe: function(wsurl, query, variables) {
-		var graphQuery = parse(query);
-		var operationName = graphQuery.definitions[0].name.value;
-		var subscriber = {
-			client: getWsClient(wsurl),
-			query: query,
-			variables: variables,
-			operationName: operationName,
-			observable: null,
-			cache: {},
-			setObservable: function(observable){
-				this.observable = observable;
-			},
-			getSubscriptionObservable: function () {
-				const link = new WebSocketLink(this.client);
-				return execute(link, {query: this.query, operationName: this.operationName, variables: this.variables});
-			},
-			end: function () {
-				this.observable.unsubscribe();
-			}
-		};
-		return subscriber;
-	},
-  initClient: function(wsurl) {
-  },
-}
+const createSubscriptionObservable = (wsurl, query, variables) => {
+		const link = new WebSocketLink(this.client);
+    return execute(link, {query: this.query, variables: variables});
+  }
+};
+
+
+// Usage example
